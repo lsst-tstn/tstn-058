@@ -1,0 +1,23 @@
+[technote]
+id = "TSTN-058"
+series_id = "TSTN"
+canonical_url = "https://tstn-058.lsst.io"
+github_url = "https://github.com/lsst-tstn/tstn-058"
+github_default_branch = "main"
+date_created = 2026-05-04T17:06:27Z
+organization.name = "NSF-DOE Vera C. Rubin Observatory"
+organization.ror = "https://ror.org/048g3cy84"
+license.id = "CC-BY-4.0"
+
+[technote.status]
+state = "draft"
+
+[[technote.authors]]
+name.given = "Craig S."
+name.family = "Lage"
+internal_id = "lagecs"
+orcid = "https://orcid.org/0000-0002-9601-345X"
+[[technote.authors.affiliations]]
+name = "University of California, Davis"
+internal_id = "UCDavis"
+address = "Davis"
