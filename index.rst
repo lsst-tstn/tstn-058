@@ -53,7 +53,7 @@ Aaron Roodman:
   The trim does not include the Look-Up Table (LUT) correction.
 
 The simulation code is available at:
-`https://github.com/lsst-so/ts_aos_analysis/blob/tickets/RSO-441/notebooks/pid_simulations/PID_Loop_Simulation_Kalman_04May26.ipynb`
+https://github.com/lsst-so/ts_aos_analysis/blob/tickets/RSO-441/notebooks/pid_simulations/PID_Loop_Simulation_Kalman_04May26.ipynb
 
 .. _methodology:
 
@@ -98,30 +98,25 @@ Two *correction lag* modes are supported, illustrated in
   but applied with a lag of :math:`N_\mathrm{corr}` visits, mimicking
   the pipeline processing delay.
 
-.. _fig-schematic number 1:
-
 .. figure:: _static/Offline_Reconstruction_PID_Simulation_2_p1.png
    :name: fig-schematic-1
-   :width: 80%
    :alt: Schematic diagram of the discard-intermediates simulation strategy
 
    Schematic of the ``discard_intermediates=True`` strategy with a
    correction lag of three visits.  A tweak is calculated from the
-   simulated Zernikes at exposure :math:`N-3` and added to the trim before
-   exposure :math:`N`.  Intermediate exposures use the unchanged trim.
-
-.. _fig-schematic number 2:
+   simulated Zernikes at exposure :math:`N-3` and added to the trim
+   before exposure :math:`N`.  Intermediate exposures use the
+   unchanged trim.
 
 .. figure:: _static/Offline_Reconstruction_PID_Simulation_2_p2.png
    :name: fig-schematic-2
-   :width: 80%
    :alt: Schematic diagram of the keep-intermediates simulation strategy
 
    Schematic of the ``discard_intermediates=False`` strategy with a
-   correction lag of three visits.  A new tweak is computed every visit
-   but the tweak applied to visit :math:`N` was computed three visits
-   earlier, so every visit benefits from the most recent available
-   correction.
+   correction lag of three visits.  A new tweak is computed every
+   visit but the tweak applied to visit :math:`N` was computed three
+   visits earlier, so every visit benefits from the most recent
+   available correction.
 
 .. _olr:
 
@@ -134,8 +129,6 @@ The OLR Z4 signal is notably larger than the measured value because the
 Camera and M2 dZ trims — which had been suppressing the Z4 error — have
 been removed.  The OLR stream is the "true" open-loop disturbance that
 the PID loop must learn to reject.
-
-.. _fig-olr plot:
 
 .. figure:: _static/PID_Simulator_OLR_20260329.png
    :name: fig-olr
@@ -159,6 +152,12 @@ Correction Lag of N+3
 :numref:`fig-A1` through :numref:`fig-A4` compare ``Kp = 0.3`` and
 ``Kp = 0.5`` with and without discarding intermediate updates, using a
 correction lag of three visits.
+
+With ``discard_intermediates=True`` the loop is stable for both gain
+values.  With ``discard_intermediates=False`` and ``Kp = 0.5``, the
+loop begins to oscillate — a well-known consequence of the three-visit
+lag acting with high gain.  Even with ``Kp = 0.3`` oscillations are
+beginning.
 
 .. list-table::
    :widths: 50 50
@@ -186,13 +185,7 @@ correction lag of three visits.
           :name: fig-A4
           :alt: Kp=0.5, keep intermediates, N+3
 
-          Kp=0.5, keep intermediates.
-
-With ``discard_intermediates=True`` the loop is stable for both gain
-values.  With ``discard_intermediates=False`` and ``Kp = 0.5``, the
-loop begins to oscillate — a well-known consequence of the three-visit
-lag acting with high gain. Even with ``Kp = 0.3`` you can see
-oscillations beginning.
+          Kp=0.5, keep intermediates.  Oscillations are clearly visible.
 
 .. _delays-n2:
 
@@ -200,7 +193,9 @@ Correction Lag of N+2
 ---------------------
 
 :numref:`fig-K1` through :numref:`fig-K4` repeat the comparison with a
-two-visit lag.
+two-visit lag.  Reducing the lag to two visits allows the
+keep-intermediates loop to remain stable at ``Kp = 0.5``, illustrating
+the expected trade-off between lag and maximum stable gain.
 
 .. list-table::
    :widths: 50 50
@@ -228,11 +223,8 @@ two-visit lag.
           :name: fig-K4
           :alt: Kp=0.5, keep intermediates, N+2
 
-          Kp=0.5, keep intermediates.
-
-Reducing the lag to two visits allows the keep-intermediates loop to
-remain stable at ``Kp = 0.5``, illustrating the expected trade-off
-between lag and maximum stable gain.
+          Kp=0.5, keep intermediates.  Stable at this gain, unlike the
+          N+3 case.
 
 .. _smith:
 
@@ -254,6 +246,9 @@ removing the lag from the controller's perspective.
 
 :numref:`fig-F13` and :numref:`fig-F15` show the improvement from the
 Smith corrector at N+3 lag; :numref:`fig-K5` shows the same at N+2 lag.
+The Smith corrector substantially reduces the residual Zernike scatter
+in the keep-intermediates regime with a lag of three visits, but the
+benefit is less clear with a lag of two visits.
 
 .. list-table::
    :widths: 50 50
@@ -279,10 +274,6 @@ Smith corrector at N+3 lag; :numref:`fig-K5` shows the same at N+2 lag.
 
      -
 
-The Smith corrector substantially reduces the residual Zernike scatter
-in the keep-intermediates regime with a lag of three visits, but the benefit
-is less clear with a lag of two visits.
-
 .. _recovery:
 
 How Well Do We Recover the Original Measured Zernikes?
@@ -297,7 +288,7 @@ approximately reproduce the measured Zernike stream.
 good.  :numref:`fig-M3` and :numref:`fig-M5` show nights where
 significant discrepancies appear, particularly in the higher-order
 Zernikes.  A possible explanation is that the bending-mode actuator
-limits applied on sky are not captured in the simulation. This needs
+limits applied on sky are not captured in the simulation.  This needs
 to be better understood.
 
 .. list-table::
@@ -327,7 +318,7 @@ to be better understood.
 
      - .. figure:: _static/PID_Simulator_M5_20260415.png
           :name: fig-M5
-          :alt: Simulation vs measured Zernikes, 20260415 (bad night)
+          :alt: Simulation vs measured Zernikes, 20260415 (different range)
 
           Night 20260415 (different sequence range) — disagreement visible
           in higher-order Zernikes (cyan circle).
@@ -337,9 +328,14 @@ to be better understood.
 DoFs vs. Vmode Control
 =======================
 
-The OFC can operate in either the native DoF basis or the Vmode basis.
-:numref:`fig-A1-dof` and :numref:`fig-B1` show that the Zernike residuals
-are visually identical between the two bases for the same gain values.
+The OFC can operate in either the native DoF basis or the virtual-mode
+(Vmode) basis, which diagonalises the sensitivity matrix and decouples
+the Zernike modes from one another.  :numref:`fig-A1-dof` and
+:numref:`fig-B1` show that the Zernike residuals are visually identical
+between the two bases for the same gain values.  Inspecting the stored
+trim arrays during the simulation confirms that the Vmodes are what is
+being controlled in both cases, because the OFC internally projects the
+DoF corrections onto the Vmode basis.
 
 .. list-table::
    :widths: 50 50
@@ -355,11 +351,8 @@ are visually identical between the two bases for the same gain values.
           :name: fig-B1
           :alt: Vmode control, Kp=0.3, discard intermediates
 
-          Vmode control, Kp=0.3, discard intermediates.
-
-Inspecting the stored trim arrays during the simulation confirms that the
-Vmodes are what is being controlled in both cases, because the OFC
-internally projects the DoF corrections onto the Vmode basis.
+          Vmode control, Kp=0.3, discard intermediates.  Results are
+          visually identical to the DoF case.
 
 The ability to specify independent gains per Vmode was verified
 empirically: reducing ``Kp(Vmode5)`` from 0.3 to 0.1 visibly increases
@@ -402,7 +395,11 @@ Proportional Gain Study
 -----------------------
 
 :numref:`fig-Kp1` through :numref:`fig-Kp4` show the effect of
-reducing the gain on Vmode 10 (which most strongly drives Z11):
+reducing the gain on Vmode 10 (which most strongly drives Z11).
+Zeroing Kp(Vmode10) removes the Z11 correction entirely, while
+reducing it to 0.02 provides a compromise between Z11 suppression and
+M2Z/CamZ stability.  In both cases the opposing oscillations of M2Z and
+CamZ are reduced.
 
 .. list-table::
    :widths: 50 50
@@ -410,8 +407,7 @@ reducing the gain on Vmode 10 (which most strongly drives Z11):
 
    * - .. figure:: _static/PID_Special_Kp1_20260420.png
           :name: fig-Kp1
-	  :width: 100%
-          :alt: All Kp=0.3
+          :alt: All Kp=0.3 (baseline)
 
           All Kp=0.3 (baseline).
 
@@ -423,7 +419,6 @@ reducing the gain on Vmode 10 (which most strongly drives Z11):
 
    * - .. figure:: _static/PID_Special_Kp2_20260420.png
           :name: fig-Kp2
-          :width: 100%
           :alt: Kp(Vmode10) = 0.1
 
           Kp(Vmode10) = 0.1.
@@ -434,11 +429,6 @@ reducing the gain on Vmode 10 (which most strongly drives Z11):
 
           Kp(Vmode10) = 0.0 (Z11 gain zeroed).
 
-Zeroing Kp(Vmode10) removes the Z11 correction entirely, while
-reducing it to 0.02 provides a compromise between Z11 suppression and
-the M2Z/CamZ stability.  In both cases the opposing oscillations
-of M2Z and CamZ are reduced.
-
 .. _z4z11-ki:
 
 Integral Gain Study (Vmodes)
@@ -446,7 +436,10 @@ Integral Gain Study (Vmodes)
 
 :numref:`fig-Ki1` through :numref:`fig-Ki4` explore the effect of
 adding an integral term to Vmode 5 (focus) while keeping Kp(Vmode10)
-reduced to 0.05:
+reduced to 0.05.  Adding an integral term on Vmode 5 reduces the
+low-frequency Z4 drift but can destabilise the loop if Ki is set too
+large.  In general, the added control from introducing Ki is somewhat
+disappointing.
 
 .. list-table::
    :widths: 50 50
@@ -475,10 +468,6 @@ reduced to 0.05:
           :alt: Ki(Vmode5) = 2.0
 
           Ki(Vmode5) = 2.0.
-
-Adding an integral term on Vmode 5 reduces the low-frequency Z4 drift
-but can destabilise the loop if Ki is set too large. In general, the
-added control by introducing Ki is somewhat disappointing.
 
 .. _zernike-control:
 
@@ -511,8 +500,6 @@ all other Zernikes at ``Kp = 0.3``.  :numref:`fig-ZControl1` and
 :numref:`fig-ZControl3` compare the Z4/Z11 cross-coupling with and
 without zeroing the Z11 gain.
 
-.. _fig zcontrol:
-
 .. figure:: _static/PID_Simulator_ZControl_20260420.png
    :name: fig-zcontrol
    :width: 85%
@@ -530,48 +517,50 @@ without zeroing the Z11 gain.
           :name: fig-ZControl1
           :alt: Zernike control, Kp(Z4)=1.0
 
-          Kp(Z4)=1.0, all other Kp=0.3.  Z4 is well controlled;
-          M2Z and CamZ show large swings.
+          Kp(Z4)=1.0, all other Kp=0.3.  Z4 is well controlled; M2Z and
+          CamZ show large swings.
 
      - .. figure:: _static/PID_Special_ZControl3_20260420.png
           :name: fig-ZControl3
           :alt: Zernike control, Kp(Z4)=1.0, Kp(Z11)=0.0
 
-          Kp(Z4)=1.0, Kp(Z11)=0.0.  Z11 is no longer driven, but
-          M2Z and CamZ swings persist.
+          Kp(Z4)=1.0, Kp(Z11)=0.0.  Z11 is no longer driven, but M2Z
+          and CamZ swings persist.
 
-.. _kalman:
+.. _plotting-options:
 
-Plotting options
-=========================
+Plotting Options
+================
 
-There are three plotting options built in, shown in figures :numref:`plot-1` through :numref:`plot-3`
+There are three plotting options built in to the simulation class,
+shown in :numref:`plot-1` through :numref:`plot-3`.
 
 .. figure:: _static/PID_Simulator_Test_1_20260329.png
    :name: plot-1
-   :width: 95%
    :alt: Simple plot option (plotPID)
 
-   The simplest plotting option plots the aos_fwhm and the six most important Zernikes.
+   The simplest plotting option (``plotPID``) shows the AOS FWHM and
+   the six most important Zernike groups vs. sequence number.
 
+.. rst-class:: technote-wide
 
 .. figure:: _static/PID_Simulator_Test_2_20260329.png
    :name: plot-2
-   :width: 180%
-   :align: center
-   :alt: Second plotting option (bigPlot1)
+   :alt: Second plotting option (bigPlotPID1)
 
-   This adds the Zernikes at all four corners, as well as all DoFs and Vmodes.
+   ``bigPlotPID1`` adds the Zernikes at all four corner detectors (top
+   panel) and all DoF trims and Vmodes (bottom panel).
 
+.. rst-class:: technote-wide
 
 .. figure:: _static/PID_Simulator_Test_3_20260329.png
    :name: plot-3
-   :width: 180%
-   :align: center
-   :alt: Third plotting option (bigPlot2)
+   :alt: Third plotting option (bigPlotPID2)
 
-   This adds plots of the integral terms for all of the DoFs.
+   ``bigPlotPID2`` replaces the per-corner Zernike columns with plots of
+   the integral terms for all active DoFs.
 
+.. _kalman:
 
 Adding the Kalman Filter
 ========================
@@ -585,7 +574,16 @@ The Zernike measurements from the corner detectors are noisy (typical
 RMS ~0.05 µm per mode), which limits the achievable PID gain.  A
 Kalman filter can be inserted between the ``applyTrim`` step and the
 ``getTweak`` step to produce an improved state estimate before the
-correction is calculated.
+correction is calculated.  The overall design is shown in
+:numref:`fig-kalman-design`.
+
+.. figure:: _static/Kalman_Filter_Design.png
+   :name: fig-kalman-design
+   :alt: Kalman filter state-space design and per-step data flow
+
+   Left: the four matrices that define the Kalman filter in state space.
+   Right: the per-step data flow showing where the update and predict
+   phases sit within the PID loop.
 
 The filter operates on a 106-element state vector composed of the 84
 active OFC Zernike values (4 detectors × 21 modes, excluding Z20/Z21)
@@ -604,20 +602,22 @@ through the sensitivity matrix:
    F = \begin{pmatrix} I_{84} & -S \\ 0 & I_{22} \end{pmatrix}
 
 where :math:`S` is the :math:`84 \times 22` sensitivity matrix.  A
-control-input matrix :math:`B` propagates the applied tweak into the
-trim state each visit.  The observation matrix :math:`H = [I_{84}\;0]`
-selects only the Zernike block, since we observe Zernikes but not the
-trim directly.
+control-input matrix :math:`B = [0_{84 \times 22};\; I_{22}]^T`
+propagates the applied tweak into the trim state each visit.  The
+observation matrix :math:`H = [I_{84}\;|\;0_{84 \times 22}]` selects
+only the Zernike block, since we observe Zernikes but not the trim
+directly.
 
-The filter is enabled with ``use_kalman=True`` and is configured by
-three covariance parameters:
+The update and predict steps follow the standard Kalman equations.  The
+filter is enabled with ``use_kalman=True`` and is configured by three
+covariance parameters:
 
 - ``kalman_r_sigma`` — standard deviation of Zernike measurement noise
-  (default 0.05 µm).
+  (default 0.05 µm); sets :math:`R = \sigma_R^2 I_{84}`.
 - ``kalman_q_z_sigma`` — process noise on the Zernike block (default
-  1×10⁻⁴ µm; Zernikes evolve slowly).
+  1×10⁻⁴ µm; Zernikes evolve slowly between visits).
 - ``kalman_q_trim_sigma`` — process noise on the trim block (default
-  1×10⁻⁶ µm; trim is updated deterministically).
+  1×10⁻⁶ µm; trim is updated deterministically via :math:`B`).
 
 When ``use_kalman=False`` (the default) the simulation is identical to
 the non-Kalman case.
@@ -627,25 +627,30 @@ the non-Kalman case.
 Results
 -------
 
-The Kalman filtering methodology is new, but there are some initial results.
-Figures :numref:`fig-kalman1` through :numref:`fig-kalman3` show what happens when the
-R-matrix of measurement errors is a multiple of the identity with the given sigma.
-When the sigma is zero, the measurements are assumed perfect and no Kalman filtering
-is done.  As the sigma increases, the loop converges more slowly until it fails to
-converge at all. Figures :numref:`fig-kalman4` through :numref:`fig-kalman6` are using
-the Zernike covariance matrix originally calculated by Bo Xin.  As I understand,
-The R-matrix and the Q-matrix determine how the Kalman filtering takes place.
-When R << Q, the measurements take precedence and little filtering is done.  When
-Q << R, the model dominates over the measurements.  In order to use the calculated
-covariance matrix, the Q sigmas needed to be increased substantially in order for
-the loop to converge.  Much more study is needed to see:
+The Kalman filtering methodology is new, but there are some initial
+results.  :numref:`fig-kalman1` through :numref:`fig-kalman3` show what
+happens when the R matrix of measurement errors is a multiple of the
+identity with a given sigma.  When the sigma is zero, the measurements
+are assumed perfect and no Kalman filtering is done.  As the sigma
+increases, the loop converges more slowly until it fails to converge at
+all.
 
-* Is the Kalman filter coded up correctly.
-* Will it be useful in our control loops.
-* What are the proper R and Q matrices to use
+:numref:`fig-kalman4` through :numref:`fig-kalman6` use the Zernike
+covariance matrix originally calculated by Bo Xin.  The R matrix and the
+Q matrix together determine how the Kalman filtering takes place: when
+:math:`R \ll Q` the measurements take precedence and little filtering is
+done; when :math:`Q \ll R` the model dominates over the measurements.
+In order to use the calculated covariance matrix, the Q sigmas needed to
+be increased substantially for the loop to converge.  Much more study is
+needed to determine:
 
-As of this writing, no benefit to the Kalman filtering is seen, but hopefully with code
-or parameter improvements we can see a benefit.
+- Whether the Kalman filter is coded correctly.
+- Whether it will be useful in our control loops.
+- What the proper R and Q matrices should be.
+
+As of this writing, no benefit to the Kalman filtering is seen, but
+hopefully with code or parameter improvements a benefit will be
+demonstrated.
 
 .. list-table::
    :widths: 50 50
@@ -653,46 +658,41 @@ or parameter improvements we can see a benefit.
 
    * - .. figure:: _static/PID_Simulator_Kalman_1_20260329.png
           :name: fig-kalman1
-          :alt: Kalman filter with R matrix sigma = 0
+          :alt: Kalman filter with R-matrix sigma = 0
 
-          With the R-matrix (measurement noise) set to zero, the
-	  Kalman filter has no impact, as expected.
+          R-matrix sigma = 0.  The Kalman filter has no impact, as
+          expected.
 
      - .. figure:: _static/PID_Simulator_Kalman_2_20260329.png
           :name: fig-kalman2
           :alt: Kalman filter with R-matrix sigma = 5E-4
 
-          With increased measurement noise, the control converges more slowly.
-	  
+          R-matrix sigma = 5×10⁻⁴.  Control converges more slowly.
+
    * - .. figure:: _static/PID_Simulator_Kalman_3_20260329.png
           :name: fig-kalman3
           :alt: Kalman filter with R-matrix sigma = 8E-4
 
-          With a further slight increase in measurement noise,
-	  the control fails to converge at all
+          R-matrix sigma = 8×10⁻⁴.  Control fails to converge.
 
      - .. figure:: _static/PID_Simulator_Kalman_4_20260329.png
           :name: fig-kalman4
-          :alt: Kalman filter with R-matrix of calculated covariances
+          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 1.0
 
-          With R being the calculated covariances, the Q sigmas need to be
-	  increased substantially Here both Q sigmas = 1.0
+          R matrix set to calculated Zernike covariances (Bo Xin).
+          Both Q sigmas = 1.0.
 
    * - .. figure:: _static/PID_Simulator_Kalman_5_20260329.png
           :name: fig-kalman5
-          :alt: Kalman filter with R-matrix sigma = 8E-4
+          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 0.5
 
-          With R being the calculated covariances, the Q sigmas need to be
-	  increased substantially Here both Q sigmas = 0.5
+          Same as above with both Q sigmas = 0.5.
 
      - .. figure:: _static/PID_Simulator_Kalman_6_20260329.png
           :name: fig-kalman6
-          :alt: Kalman filter with R-matrix sigma = 8E-4
+          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 2.0
 
-          With R being the calculated covariances, the Q sigmas need to be
-	  increased substantially Here both Q sigmas = 2.0
-
-
+          Same as above with both Q sigmas = 2.0.
 
 .. _conclusions:
 
@@ -700,25 +700,23 @@ Conclusions and Future Work
 ============================
 
 The open-loop reproduction PID simulator has proved to be a useful tool
-for understanding and optimizing the MTAOS control loop without
+for understanding and optimising the MTAOS control loop without
 consuming on-sky time.  Key findings from the first round of simulations
 are:
 
 - **Correction lag causes oscillations.**  Keeping intermediate updates
   with a large correction lag leads to loop oscillations, particularly
-  for higher gains.  Discarding intermediate updates (applying a
-  correction only every :math:`N_\mathrm{corr}` visits) eliminates
-  this instability at the cost of slower convergence.  However, with
-  a correction lag of two, which we believe we can routinely see in
-  the future, the oscillation problem is much reduced.  In this case,
-  we may be able to go back to keeping the intermediate updates.  This
-  would be beneficial since things will update more rapidly.
+  for higher gains.  Discarding intermediate updates eliminates this
+  instability at the cost of slower convergence.  However, with a
+  correction lag of two — which we expect to be routinely achievable in
+  the future — the oscillation problem is much reduced, and it may be
+  possible to return to keeping intermediate updates for faster response.
 
 - **The Smith predictor/corrector reduces oscillations.**  Adding the
   Smith correction term substantially reduces Zernike scatter in the
   keep-intermediates regime and allows higher gains to be used stably.
-  However, it appears less useful when the correction lag is
-  reduced from tree to two.
+  However, it appears less useful when the lag is reduced from three
+  visits to two.
 
 - **DoF and Vmode control are equivalent for the same gain values.**
   Internally the OFC always projects corrections onto the Vmode basis,
@@ -744,4 +742,5 @@ are:
   where the simulation does not recover the measured Zernikes.
 - Explore the full parameter space of Kp, Ki, and ``max_integral``.
 - Test the Zernike-space control mode more systematically.
-
+- Consider adding simulated measurement noise to the OLR stream to
+  enable quantitative evaluation of the Kalman filter.
