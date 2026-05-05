@@ -98,7 +98,9 @@ Two *correction lag* modes are supported, illustrated in
   but applied with a lag of :math:`N_\mathrm{corr}` visits, mimicking
   the pipeline processing delay.
 
+
 .. figure:: _static/Offline_Reconstruction_PID_Simulation_2_p1.png
+   :width: 100%
    :name: fig-schematic-1
    :alt: Schematic diagram of the discard-intermediates simulation strategy
 
@@ -107,8 +109,9 @@ Two *correction lag* modes are supported, illustrated in
    simulated Zernikes at exposure :math:`N-3` and added to the trim
    before exposure :math:`N`.  Intermediate exposures use the
    unchanged trim.
-
+   
 .. figure:: _static/Offline_Reconstruction_PID_Simulation_2_p2.png
+   :width: 100%
    :name: fig-schematic-2
    :alt: Schematic diagram of the keep-intermediates simulation strategy
 
@@ -132,7 +135,7 @@ the PID loop must learn to reject.
 
 .. figure:: _static/PID_Simulator_OLR_20260329.png
    :name: fig-olr
-   :width: 60%
+   :width: 100%
    :alt: Open-loop reproduction versus measured Zernikes for 20260329
 
    Open-loop reproduction (circles) versus measured Zernikes (crosses)
@@ -164,29 +167,33 @@ beginning.
    :header-rows: 0
 
    * - .. figure:: _static/PID_Simulator_A1_20260329.png
-          :name: fig-A1
-          :alt: Kp=0.3, discard intermediates, N+3
+	  :width: 100%
+	  :name: fig-A1
+	  :alt: Kp=0.3, discard intermediates, N+3
 
-          Kp=0.3, discard intermediates.
-
+          Kp=0.3, discard intermediates, N+3
+	  
      - .. figure:: _static/PID_Simulator_A3_20260329.png
-          :name: fig-A3
-          :alt: Kp=0.3, keep intermediates, N+3
+	  :width: 100%
+	  :name: fig-A3
+	  :alt: Kp=0.3, keep intermediates, N+3
 
-          Kp=0.3, keep intermediates.
-
+          Kp=0.3, keep intermediates, N+3
+	  
    * - .. figure:: _static/PID_Simulator_A2_20260329.png
-          :name: fig-A2
-          :alt: Kp=0.5, discard intermediates, N+3
+	  :width: 100%
+	  :name: fig-A2
+	  :alt: Kp=0.5, discard intermediates, N+3
 
-          Kp=0.5, discard intermediates.
-
+          Kp=0.5, discard intermediates, N+3
+	  
      - .. figure:: _static/PID_Simulator_A4_20260329.png
-          :name: fig-A4
-          :alt: Kp=0.5, keep intermediates, N+3
+	  :width: 100%
+	  :name: fig-A4
+	  :alt: Kp=0.5, keep intermediates, N+3
 
-          Kp=0.5, keep intermediates.  Oscillations are clearly visible.
-
+          Kp=0.5, keep intermediates, N+3
+		
 .. _delays-n2:
 
 Correction Lag of N+2
@@ -202,30 +209,34 @@ the expected trade-off between lag and maximum stable gain.
    :header-rows: 0
 
    * - .. figure:: _static/PID_Simulator_K1_20260329.png
+          :width: 100%
           :name: fig-K1
           :alt: Kp=0.3, discard intermediates, N+2
 
-          Kp=0.3, discard intermediates.
-
+	  Kp=0.3, discard intermediates, N+2	
+		
      - .. figure:: _static/PID_Simulator_K3_20260329.png
+          :width: 100%
           :name: fig-K3
           :alt: Kp=0.3, keep intermediates, N+2
 
-          Kp=0.3, keep intermediates.
+          Kp=0.3, keep intermediates, N+2
 
    * - .. figure:: _static/PID_Simulator_K2_20260329.png
+          :width: 100%
           :name: fig-K2
           :alt: Kp=0.5, discard intermediates, N+2
 
-          Kp=0.5, discard intermediates.
+          Kp=0.5, discard intermediates, N+2
 
      - .. figure:: _static/PID_Simulator_K4_20260329.png
+          :width: 100%
           :name: fig-K4
           :alt: Kp=0.5, keep intermediates, N+2
 
-          Kp=0.5, keep intermediates.  Stable at this gain, unlike the
-          N+3 case.
+          Kp=0.5, keep intermediates. N+2
 
+		
 .. _smith:
 
 Using the Smith Predictor/Corrector
@@ -255,22 +266,25 @@ benefit is less clear with a lag of two visits.
    :header-rows: 0
 
    * - .. figure:: _static/PID_Simulator_F13_20260329.png
+          :width: 100%
           :name: fig-F13
           :alt: Keep intermediates, Kp=0.3, Smith corrector, N+3
 
-          Keep intermediates, Kp=0.3, with Smith corrector (N+3).
+          Kp=0.3, keep intermediates, N+3, Smith.
 
      - .. figure:: _static/PID_Simulator_F15_20260329.png
+          :width: 100%
           :name: fig-F15
           :alt: Keep intermediates, Kp=0.2, Smith corrector, N+3
 
-          Keep intermediates, Kp=0.2, with Smith corrector (N+3).
+          Kp=0.2, keep intermediates, N+3, Smith.
 
    * - .. figure:: _static/PID_Simulator_K5_20260329.png
+          :width: 100%
           :name: fig-K5
           :alt: Keep intermediates, Kp=0.3, Smith corrector, N+2
 
-          Keep intermediates, Kp=0.3, with Smith corrector (N+2).
+          Kp=0.3, keep intermediates, N+2, Smith
 
      -
 
@@ -296,32 +310,46 @@ to be better understood.
    :header-rows: 0
 
    * - .. figure:: _static/PID_Simulator_M1_20260329.png
+          :width: 100%
           :name: fig-M1
           :alt: Simulation vs measured Zernikes, 20260329
 
-          Night 20260329 — simulation (circles) versus measured (crosses).
-          Recovery is good.
+          Night 20260329 — simulation (circles)
+
+	  versus measured (crosses).
+
+	  Recovery is good.
 
      - .. figure:: _static/PID_Simulator_M4_20260415.png
+          :width: 100%
           :name: fig-M4
           :alt: Simulation vs measured Zernikes, 20260415
 
-          Night 20260415 — simulation (circles) versus measured (crosses).
-          Recovery is good.
+          Night 20260415 — simulation (circles)
+
+	  versus measured (crosses).
+
+	  Recovery is good.
 
    * - .. figure:: _static/PID_Simulator_M3_20260412.png
+          :width: 100%
           :name: fig-M3
           :alt: Simulation vs measured Zernikes, 20260412
 
-          Night 20260412 — higher-order Zernikes show significant
-          disagreement.
+          Night 20260412 — higher-order Zernikes
+
+	  show significant disagreement.
 
      - .. figure:: _static/PID_Simulator_M5_20260415.png
+          :width: 100%
           :name: fig-M5
           :alt: Simulation vs measured Zernikes, 20260415 (different range)
 
-          Night 20260415 (different sequence range) — disagreement visible
-          in higher-order Zernikes (cyan circle).
+          Night 20260415 (different sequence range)
+
+	  disagreement visible in
+
+	  higher-order Zernikes (cyan circle).
 
 .. _vmodes:
 
@@ -342,17 +370,24 @@ DoF corrections onto the Vmode basis.
    :header-rows: 0
 
    * - .. figure:: _static/PID_Simulator_A1_20260329.png
+          :width: 100%
           :name: fig-A1-dof
           :alt: DoF control, Kp=0.3, discard intermediates
 
-          DoF control, Kp=0.3, discard intermediates.
+          DoF control, Kp=0.3,
+
+	  discard intermediates.
 
      - .. figure:: _static/PID_Simulator_B1_20260329.png
+          :width: 100%
           :name: fig-B1
           :alt: Vmode control, Kp=0.3, discard intermediates
 
-          Vmode control, Kp=0.3, discard intermediates.  Results are
-          visually identical to the DoF case.
+          Vmode control, Kp=0.3,
+
+	  discard intermediates. Results
+
+	  are visually identical to the DoF case.
 
 The ability to specify independent gains per Vmode was verified
 empirically: reducing ``Kp(Vmode5)`` from 0.3 to 0.1 visibly increases
@@ -365,18 +400,22 @@ that the Vmodes are the effective control variables.
    :header-rows: 0
 
    * - .. figure:: _static/PID_Simulator_B2_20260329.png
+          :width: 100%
           :name: fig-B2
           :alt: Vmode control, Kp(Vmode5) reduced to 0.1
 
-          Vmode control, Kp(Vmode5) = 0.1.  Z4 residuals increase, as
-          expected.
+          Vmode control, Kp(Vmode5) = 0.1.
+
+	  Z4 residuals increase, as expected.
 
      - .. figure:: _static/PID_Simulator_B3_20260329.png
+          :width: 100%
           :name: fig-B3
           :alt: Vmode control, Kp(Vmode6,7) reduced to 0.05
 
-          Vmode control, Kp(Vmode6,7) = 0.05.  Astigmatism residuals
-          increase.
+          Vmode control, Kp(Vmode6,7) = 0.05.
+
+	  Astigmatism residuals increase.
 
 .. _z4z11:
 
@@ -406,28 +445,34 @@ CamZ are reduced.
    :header-rows: 0
 
    * - .. figure:: _static/PID_Special_Kp1_20260420.png
+          :width: 100%
           :name: fig-Kp1
           :alt: All Kp=0.3 (baseline)
 
           All Kp=0.3 (baseline).
 
      - .. figure:: _static/PID_Special_Kp3_20260420.png
+          :width: 100%
           :name: fig-Kp3
           :alt: Kp(Vmode10) = 0.02
 
           Kp(Vmode10) = 0.02.
 
    * - .. figure:: _static/PID_Special_Kp2_20260420.png
+          :width: 100%
           :name: fig-Kp2
           :alt: Kp(Vmode10) = 0.1
 
           Kp(Vmode10) = 0.1.
 
      - .. figure:: _static/PID_Special_Kp4_20260420.png
+          :width: 100%
           :name: fig-Kp4
           :alt: Kp(Vmode10) = 0.0
 
-          Kp(Vmode10) = 0.0 (Z11 gain zeroed).
+          Kp(Vmode10) = 0.0
+
+	  (Z11 gain zeroed).
 
 .. _z4z11-ki:
 
@@ -446,24 +491,28 @@ disappointing.
    :header-rows: 0
 
    * - .. figure:: _static/PID_Special_Ki1_20260420.png
+          :width: 100%
           :name: fig-Ki1
           :alt: Ki(Vmode5) = 0.2
 
           Ki(Vmode5) = 0.2.
 
      - .. figure:: _static/PID_Special_Ki3_20260420.png
+          :width: 100%
           :name: fig-Ki3
           :alt: Ki(Vmode5) = 1.0
 
           Ki(Vmode5) = 1.0.
 
    * - .. figure:: _static/PID_Special_Ki2_20260420.png
+          :width: 100%
           :name: fig-Ki2
           :alt: Ki(Vmode5) = 0.5
 
           Ki(Vmode5) = 0.5.
 
      - .. figure:: _static/PID_Special_Ki5_20260420.png
+          :width: 100%
           :name: fig-Ki4
           :alt: Ki(Vmode5) = 2.0
 
@@ -514,18 +563,26 @@ without zeroing the Z11 gain.
    :header-rows: 0
 
    * - .. figure:: _static/PID_Special_ZControl1_20260420.png
+          :width: 100%
           :name: fig-ZControl1
           :alt: Zernike control, Kp(Z4)=1.0
 
-          Kp(Z4)=1.0, all other Kp=0.3.  Z4 is well controlled; M2Z and
-          CamZ show large swings.
+          Kp(Z4)=1.0, all other Kp=0.3.
+
+	  Z4 is well controlled; M2Z and
+
+	  CamZ show large swings.
 
      - .. figure:: _static/PID_Special_ZControl3_20260420.png
+          :width: 100%
           :name: fig-ZControl3
           :alt: Zernike control, Kp(Z4)=1.0, Kp(Z11)=0.0
 
-          Kp(Z4)=1.0, Kp(Z11)=0.0.  Z11 is no longer driven, but M2Z
-          and CamZ swings persist.
+          Kp(Z4)=1.0, Kp(Z11)=0.0.
+
+	  Z11 is no longer driven,
+
+	  but M2Z and CamZ swings persist.
 
 .. _plotting-options:
 
@@ -536,6 +593,7 @@ There are three plotting options built in to the simulation class,
 shown in :numref:`plot-1` through :numref:`plot-3`.
 
 .. figure:: _static/PID_Simulator_Test_1_20260329.png
+   :width: 100%
    :name: plot-1
    :alt: Simple plot option (plotPID)
 
@@ -545,6 +603,7 @@ shown in :numref:`plot-1` through :numref:`plot-3`.
 .. rst-class:: technote-wide
 
 .. figure:: _static/PID_Simulator_Test_2_20260329.png
+   :width: 100%
    :name: plot-2
    :alt: Second plotting option (bigPlotPID1)
 
@@ -554,6 +613,7 @@ shown in :numref:`plot-1` through :numref:`plot-3`.
 .. rst-class:: technote-wide
 
 .. figure:: _static/PID_Simulator_Test_3_20260329.png
+   :width: 100%
    :name: plot-3
    :alt: Third plotting option (bigPlotPID2)
 
@@ -578,6 +638,7 @@ correction is calculated.  The overall design is shown in
 :numref:`fig-kalman-design`.
 
 .. figure:: _static/Kalman_Filter_Design.png
+   :width: 100%
    :name: fig-kalman-design
    :alt: Kalman filter state-space design and per-step data flow
 
@@ -657,42 +718,62 @@ demonstrated.
    :header-rows: 0
 
    * - .. figure:: _static/PID_Simulator_Kalman_1_20260329.png
+          :width: 100%
           :name: fig-kalman1
           :alt: Kalman filter with R-matrix sigma = 0
 
-          R-matrix sigma = 0.  The Kalman filter has no impact, as
-          expected.
+          R-matrix sigma = 0.
+
+	  The Kalman filter
+
+	  has no impact, as expected.
 
      - .. figure:: _static/PID_Simulator_Kalman_2_20260329.png
+          :width: 100%
           :name: fig-kalman2
           :alt: Kalman filter with R-matrix sigma = 5E-4
 
-          R-matrix sigma = 5×10⁻⁴.  Control converges more slowly.
+          R-matrix sigma = 5×10⁻⁴.
+
+	  Control converges more slowly.
 
    * - .. figure:: _static/PID_Simulator_Kalman_3_20260329.png
+          :width: 100%
           :name: fig-kalman3
           :alt: Kalman filter with R-matrix sigma = 8E-4
 
-          R-matrix sigma = 8×10⁻⁴.  Control fails to converge.
+          R-matrix sigma = 8×10⁻⁴.
 
-     - .. figure:: _static/PID_Simulator_Kalman_4_20260329.png
+	  Control fails to converge.
+
+     - .. figure:: _static/PID_Simulator_Kalman_9_20260329.png
+          :width: 100%
           :name: fig-kalman4
           :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 1.0
 
-          R matrix set to calculated Zernike covariances (Bo Xin).
-          Both Q sigmas = 1.0.
+          R matrix set to calculated
 
-   * - .. figure:: _static/PID_Simulator_Kalman_5_20260329.png
+	  Zernike covariances (Bo Xin).
+
+	  Both Q sigmas = 0.01.
+
+   * - .. figure:: _static/PID_Simulator_Kalman_10_20260329.png
+          :width: 100%
           :name: fig-kalman5
           :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 0.5
 
-          Same as above with both Q sigmas = 0.5.
+          Same as above with
 
-     - .. figure:: _static/PID_Simulator_Kalman_6_20260329.png
+	  both Q sigmas = 0.1.
+
+     - .. figure:: _static/PID_Simulator_Kalman_11_20260329.png
+          :width: 100%
           :name: fig-kalman6
           :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 2.0
 
-          Same as above with both Q sigmas = 2.0.
+          Same as above with
+
+	  both Q sigmas = 0.2.
 
 .. _conclusions:
 
