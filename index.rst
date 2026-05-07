@@ -654,16 +654,15 @@ and the 22 active DoF trim values:
 
    \mathbf{x} = \begin{pmatrix} \mathbf{z}_\mathrm{flat} \\ \mathbf{t} \end{pmatrix}
 
-The state transition matrix :math:`F` encodes the physical model that
-the trim persists between visits and that its Zernike effect propagates
-through the sensitivity matrix:
+The state transition matrix :math:`F` at present is simply the identity matrix,
+so the trim and zernike values persist between visits.  This formulation of the
+Kalman filter needs discussion.
 
 .. math::
 
-   F = \begin{pmatrix} I_{84} & -S \\ 0 & I_{22} \end{pmatrix}
+   F = \begin{pmatrix} I_{106} \end{pmatrix}
 
-where :math:`S` is the :math:`84 \times 22` sensitivity matrix.  A
-control-input matrix :math:`B = [0_{84 \times 22};\; I_{22}]^T`
+A control-input matrix :math:`B = [0_{84 \times 22};\; I_{22}]^T`
 propagates the applied tweak into the trim state each visit.  The
 observation matrix :math:`H = [I_{84}\;|\;0_{84 \times 22}]` selects
 only the Zernike block, since we observe Zernikes but not the trim
@@ -674,7 +673,8 @@ filter is enabled with ``use_kalman=True`` and is configured by three
 covariance parameters:
 
 - ``kalman_r_sigma`` — standard deviation of Zernike measurement noise
-  (default 0.05 µm); sets :math:`R = \sigma_R^2 I_{84}`.
+  (default 0.05 µm); sets :math:`R = \sigma_R^2 I_{84}`.  There is also
+  the option to enter the kalman_r matrix directly.
 - ``kalman_q_z_sigma`` — process noise on the Zernike block (default
   1×10⁻⁴ µm; Zernikes evolve slowly between visits).
 - ``kalman_q_trim_sigma`` — process noise on the trim block (default
@@ -689,14 +689,14 @@ Results
 -------
 
 The Kalman filtering methodology is new, but there are some initial
-results.  :numref:`fig-kalman1` through :numref:`fig-kalman3` show what
+results.  :numref:`fig-kalman1` through :numref:`fig-kalman4` show what
 happens when the R matrix of measurement errors is a multiple of the
 identity with a given sigma.  When the sigma is zero, the measurements
 are assumed perfect and no Kalman filtering is done.  As the sigma
 increases, the loop converges more slowly until it fails to converge at
 all.
 
-:numref:`fig-kalman4` through :numref:`fig-kalman6` use the Zernike
+:numref:`fig-kalman5` through :numref:`fig-kalman8` use the Zernike
 covariance matrix originally calculated by Bo Xin.  The R matrix and the
 Q matrix together determine how the Kalman filtering takes place: when
 :math:`R \ll Q` the measurements take precedence and little filtering is
@@ -728,53 +728,74 @@ demonstrated.
 
 	  has no impact, as expected.
 
-     - .. figure:: _static/PID_Simulator_Kalman_2_20260329.png
+     - .. figure:: _static/PID_Simulator_Kalman_3_20260329.png
           :width: 100%
           :name: fig-kalman2
+          :alt: Kalman filter with R-matrix sigma = 1E-4
+
+          R-matrix sigma = 1×10⁻⁴.
+
+	  Similar to R_sigma = 0.0.
+
+   * - .. figure:: _static/PID_Simulator_Kalman_2_20260329.png
+          :width: 100%
+          :name: fig-kalman3
           :alt: Kalman filter with R-matrix sigma = 5E-4
 
           R-matrix sigma = 5×10⁻⁴.
 
 	  Control converges more slowly.
 
-   * - .. figure:: _static/PID_Simulator_Kalman_3_20260329.png
+     - .. figure:: _static/PID_Simulator_Kalman_4_20260329.png
           :width: 100%
-          :name: fig-kalman3
+          :name: fig-kalman4
           :alt: Kalman filter with R-matrix sigma = 8E-4
 
           R-matrix sigma = 8×10⁻⁴.
 
-	  Control fails to converge.
+	  Control converges more slowly still.
+
+.. list-table::
+   :widths: 50 50
+   :header-rows: 0
+
+	  
+   * - .. figure:: _static/PID_Simulator_Kalman_7_20260329.png
+          :width: 100%
+          :name: fig-kalman5
+          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 1E-4
+
+          R=calculated covs
+
+	  both Q sigmas = 1E-4.
+
+     - .. figure:: _static/PID_Simulator_Kalman_10_20260329.png
+          :width: 100%
+          :name: fig-kalman6
+          :alt: Kalman filter with R=calculated covs, Q sigmas = 0.001
+
+          R=calculated covs
+
+	  both Q sigmas = 1E-3.
+
+   * - .. figure:: _static/PID_Simulator_Kalman_8_20260329.png
+          :width: 100%
+          :name: fig-kalman7
+          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 0.01
+
+          R=calculated covs
+
+	  both Q sigmas = 0.01.
 
      - .. figure:: _static/PID_Simulator_Kalman_9_20260329.png
           :width: 100%
-          :name: fig-kalman4
-          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 1.0
+          :name: fig-kalman8
+          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 0.1
 
-          R matrix set to calculated
-
-	  Zernike covariances (Bo Xin).
-
-	  Both Q sigmas = 0.01.
-
-   * - .. figure:: _static/PID_Simulator_Kalman_10_20260329.png
-          :width: 100%
-          :name: fig-kalman5
-          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 0.5
-
-          Same as above with
+          R=calculated covs
 
 	  both Q sigmas = 0.1.
-
-     - .. figure:: _static/PID_Simulator_Kalman_11_20260329.png
-          :width: 100%
-          :name: fig-kalman6
-          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 2.0
-
-          Same as above with
-
-	  both Q sigmas = 0.2.
-
+	  
 .. _conclusions:
 
 Conclusions and Future Work
