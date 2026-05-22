@@ -53,7 +53,7 @@ Aaron Roodman:
   The trim does not include the Look-Up Table (LUT) correction.
 
 The simulation code is available at:
-https://github.com/lsst-so/ts_aos_analysis/blob/tickets/RSO-441/notebooks/pid_simulations/PID_Loop_Simulation_Kalman_04May26.ipynb
+https://github.com/lsst-so/ts_aos_analysis/blob/tickets/RSO-441/notebooks/pid_simulations/PID_Loop_Simulation_Kalman_12May26_E.ipynb
 
 .. _methodology:
 
@@ -83,7 +83,7 @@ Zernikes, which are passed to ``getTweak`` (the OFC) to compute the
 next correction.  The correction is accumulated into the trim and the
 loop advances to the next visit.
 
-**Step 3 — Analyse and plot results.**
+**Step 3 — Analyze and plot results.**
 Simulated Zernike residuals, DoF/Vmode trims, integral terms, and the
 AOS contribution to the PSF FWHM are available as stored arrays and can
 be visualised with the built-in plotting methods.
@@ -517,6 +517,55 @@ disappointing.
           :alt: Ki(Vmode5) = 2.0
 
           Ki(Vmode5) = 2.0.
+
+Integral Gain Study (Leaky integrator)
+--------------------------------------------
+
+To try and improve the performance when including the integral (Ki) term,
+this section explores the use of a "leaky integrator".  Instead of just
+adding up the error terms from the previous exposures, the leaky integrator
+reduces the contribution of older terms by a fixed factor (called Ifactor).
+Thus, the contribution of older images is reduced by a factor of  :math:  `Ifactor^(N - Nprevious)`.
+This has proven to allow the use of the Ki term without inducing the
+oscillations seen previously.
+Figures :numref:`fig-leaky1` through :numref:`fig-leaky4` 
+show that Ifactors of 0.5-0.8 show acceptable performance, and in fact
+improved performance over the baseline of Ki=0.  At larger values of Ifactor,
+we begin to see oscillations.  The leaky integral approach looks
+promising, and we are pursuing implementing it in the ofs code so we
+can test it out on sky.
+
+.. list-table::
+   :widths: 50 50
+   :header-rows: 0
+
+   * - .. figure:: _static/PID_Simulator_Leaky_1_20260408.png
+          :width: 100%
+          :name: fig-leaky1
+          :alt: Ifactor=0.5
+
+          Ifactor = 0.5.
+
+     - .. figure:: _static/PID_Simulator_Leaky_2_20260408.png
+          :width: 100%
+          :name: fig-leaky2
+          :alt: Ifactor=0.9
+
+          Ifactor = 0.8.
+
+   * - .. figure:: _static/PID_Simulator_Leaky_3_20260408.png
+          :width: 100%
+          :name: fig-leaky3
+          :alt: Ifactor=0.9
+
+          Ifactor = 0.9.
+
+     - .. figure:: _static/PID_Simulator_Leaky_5_20260408.png
+          :width: 100%
+          :name: fig-leaky4
+          :alt: Ifactor=0.99
+
+          Ifactor = 0.99.
 
 .. _zernike-control:
 
