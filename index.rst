@@ -165,7 +165,7 @@ Then we run the simulation with a Kp only:
    proportional term, the correction never "catches up" with the
    changing truss length.
 
-Now we extract to OLR by removing the hexapod shifts with the sensitivity term:
+Now we extract the OLR by removing the hexapod shifts with the sensitivity term:
 
 .. code-block:: python
 
@@ -196,7 +196,7 @@ this time incuding a Ki term using a "leaky integrator".
     for i in range(n_images - 1):
         sim_z4[i] = olr[i] - new_hexapod_shift[i] * sensitivity
         error =  sim_z4[i] / sensitivity
-        integral = error + integral * 0.8
+        integral = error + integral * i_factor
         new_hexapod_shift[i+1] = new_hexapod_shift[i] +
 	    error * kp + integral * ki
 
