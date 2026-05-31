@@ -121,10 +121,102 @@ Two *correction lag* modes are supported, illustrated in
    visits earlier, so every visit benefits from the most recent
    available correction.
 
-.. _olr:
 
-Open-Loop Reconstruction
-========================
+Toy model of Open Loop Reconstruction
+==================================================
+
+To illustrate the technique, this section introduces a toy model of the
+telescope and control system.  We imagine a telescope where the truss
+is slowly lengthening due to temperature effects, growing by 1 mm over
+50 images.  We compensate for the changing truss length with a single
+DoF, the hexapod-Z.  First, we set up the parameters:
+
+.. code-block:: python
+
+    n_images = 50
+    total_drift = 1000 # um -> 1mm total drift during 50images
+    z4_sigma = 0.2 # um of measurement noise
+    truss = np.linspace(0, total_drift, n_images)
+    sensitivity = .01 # um of Z4 per um of truss shift
+    z4_noise = np.random.normal(0.0, z4_sigma, n_images)
+    hexapod_shift = np.zeros(n_images)
+    meas_z4 = np.zeros(n_images)
+
+Then we run the simulation with a Kp only:
+
+.. code-block:: python
+
+    kp = 0.5
+    for i in range(n_images - 1):
+        meas_z4[i] = (truss[i] - hexapod_shift[i]) * sensitivity +
+	    z4_noise[i]
+        error =  meas_z4[i] / sensitivity
+        hexapod_shift[i+1] = hexapod_shift[i] + error * kp		
+
+:numref:`fig-kp-only` shows that, with only a Kp term, the control loop never "catches up". 
+
+
+.. figure:: _static/Simple_OLR_Kp_Only.png
+   :name: fig-kp-only
+   :width: 100%
+   :alt: Toy model with Kp only.
+
+   The results of the toy model with Kp only.  With only a
+   proportional term, the correction never "catches up" with the
+   changing truss length.
+
+Now we extract to OLR by removing the hexapod shifts with the sensitivity term:
+
+.. code-block:: python
+
+    olr = meas_z4 + hexapod_shift * sensitivity
+
+:numref:`fig-toy-olr` shows the OLR for the toy model.
+
+
+.. figure:: _static/Simple_OLR_OLR.png
+   :name: fig-toy-olr
+   :width: 100%
+   :alt: Toy model OLR
+
+   The OLR extracted from the toy model.  This shows what the
+   measured Z4 values would have been if we had introduced no
+   hexapod correction.
+
+Next, we use the OLR to try running a different control loop,
+this time incuding a Ki term using a "leaky integrator".
+
+.. code-block:: python
+
+    new_hexapod_shift = np.zeros(n_images)
+    sim_z4 = np.zeros(n_images)
+    ki = 0.5
+    integral = 0.0
+    i_factor = 0.8
+    for i in range(n_images - 1):
+        sim_z4[i] = olr[i] - new_hexapod_shift[i] * sensitivity
+        error =  sim_z4[i] / sensitivity
+        integral = error + integral * 0.8
+        new_hexapod_shift[i+1] = new_hexapod_shift[i] +
+	    error * kp + integral * ki
+
+:numref:`fig-kp-ki` shows that, by adding the Ki term, the correction matches the
+changing truss length much better, and the Z4 values are much improved.	
+
+.. figure:: _static/Simple_OLR_Kp_Ki.png
+   :name: fig-kp-ki
+   :width: 100%
+   :alt: Toy model with Kp and ki.
+
+   The results of the toy model using the OLR to test a new
+   control loop, using both a Kp and Ki term, where the integral term
+   uses a "leaky integrator", where older terms have exponentially
+   lower weights. The alternate control loop better follows the
+   changing truss length, and the Z4 errors are much reduced.
+   
+
+Open-Loop Reconstruction - Results
+=====================================
 
 :numref:`fig-olr` shows the OLR Zernike stream (circles) alongside the
 original measured Zernikes (crosses) for the night of 20260329.
