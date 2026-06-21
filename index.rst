@@ -380,6 +380,87 @@ benefit is less clear with a lag of two visits.
 
      -
 
+Using the Smith Predictor/Corrector at longer correction lags
+-------------------------------------------------------------------
+
+A second study of using the Smith Corrector at larger correction lags was carried out.  Figures :numref:`smith-2`
+to :numref:`no-smith-5` show the impact of the Smith corrector for correction lags of 2, 3, 4, and 5.  While the
+Smith corrector shows a small improvement at a correction lag of 3, it has little benefit at correction lags of 4 and 5.
+
+.. list-table::
+   :widths: 50 50
+   :header-rows: 0
+
+   * - .. figure:: _static/PID_Simulator_No_Smith_2_20260329.png
+          :width: 100%
+          :name: smith-2
+          :alt: Corr-lag=2, No Smith
+		
+	  Kp=0.3, keep intermediates, N+2, No Smith	
+		
+     - .. figure:: _static/PID_Simulator_Smith_2_20260329.png
+          :width: 100%
+          :name: no-smith-2
+          :alt: Corr-lag=2, Smith
+		
+	  Kp=0.3, keep intermediates, N+2, Smith	
+
+.. list-table::
+   :widths: 50 50
+   :header-rows: 0
+
+   * - .. figure:: _static/PID_Simulator_No_Smith_3_20260329.png
+          :width: 100%
+          :name: smith-3
+          :alt: Corr-lag=3, No Smith
+		
+	  Kp=0.3, keep intermediates, N+3, No Smith	
+		
+     - .. figure:: _static/PID_Simulator_Smith_3_20260329.png
+          :width: 100%
+          :name: no-smith-3
+          :alt: Corr-lag=3, Smith
+		
+	  Kp=0.3, keep intermediates, N+3, Smith	
+
+.. list-table::
+   :widths: 50 50
+   :header-rows: 0
+
+   * - .. figure:: _static/PID_Simulator_No_Smith_4_20260329.png
+          :width: 100%
+          :name: smith-4
+          :alt: Corr-lag=4, No Smith
+		
+	  Kp=0.3, keep intermediates, N+4, No Smith	
+		
+     - .. figure:: _static/PID_Simulator_Smith_4_20260329.png
+          :width: 100%
+          :name: no-smith-4
+          :alt: Corr-lag=4, Smith
+		
+	  Kp=0.3, keep intermediates, N+4, Smith	
+
+.. list-table::
+   :widths: 50 50
+   :header-rows: 0
+
+   * - .. figure:: _static/PID_Simulator_No_Smith_5_20260329.png
+          :width: 100%
+          :name: smith-5
+          :alt: Corr-lag=5, No Smith
+		
+	  Kp=0.3, keep intermediates, N+5, No Smith	
+		
+     - .. figure:: _static/PID_Simulator_Smith_5_20260329.png
+          :width: 100%
+          :name: no-smith-5
+          :alt: Corr-lag=5, Smith
+		
+	  Kp=0.3, keep intermediates, N+2, Smith	
+
+	  
+
 .. _recovery:
 
 How Well Do We Recover the Original Measured Zernikes?
