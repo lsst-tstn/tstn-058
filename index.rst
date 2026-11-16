@@ -847,181 +847,75 @@ shown in :numref:`plot-1` through :numref:`plot-3`.
 Adding the Kalman Filter
 ========================
 
-.. _kalman-methodology:
+Several attempts have been made to add a Kalman filter to the simulation methodology, but none of these were successful.  So I have stripped out the section referring to the Kalman filter from this technote.
 
-Methodology
------------
+Adding the Leaky Integrator to the On-Sky control
+=======================================================
 
-The Zernike measurements from the corner detectors are noisy (typical
-RMS ~0.05 µm per mode), which limits the achievable PID gain.  A
-Kalman filter can be inserted between the ``applyTrim`` step and the
-``getTweak`` step to produce an improved state estimate before the
-correction is calculated.  The overall design is shown in
-:numref:`fig-kalman-design`.
+A simple explanation of the leaky integrator is discussed in "Integral Gain Study (Leaky integrator)" section and in the "Toy model of Open Loop Reconstruction" section.  The leaky integrator was implemented in the ts_ofc code and testing on sky began on 2026-11-12.  It is still not clear how much it helped, but it doesn't appear to have done any harm, and it may have reduced the AOS_FWHM values.  In this section, some additional simulations were run to try and fine tune some of the parameters.  I will preface this by saying that I don't have a lot of confidence that these simulations are useful for quantitative fine tuning.  However, I will present the simulations I have done.  The simulations in this section were done with code at:
+https://github.com/lsst-so/ts_aos_analysis/blob/tickets/RSO-441/notebooks/pid_simulations/PID_Loop_Simulation_16Nov26.ipynb
 
-.. figure:: _static/Kalman_Filter_Design.png
+How well do we reproduce the measured Zernikes with the leaky integrator in place?
+-------------------------------------------------------------------------------------------------
+
+Figure :numref:`fig-leaky-1` shows that the simulation is reproducing the measured Zernikes reasonably well.
+
+.. figure:: _static/PID_Simulator_Test_20261113.png
+   :name: fig-leaky-1
    :width: 100%
-   :name: fig-kalman-design
-   :alt: Kalman filter state-space design and per-step data flow
+   :alt: Baseline leaky integrator simulation
 
-   Left: the four matrices that define the Kalman filter in state space.
-   Right: the per-step data flow showing where the update and predict
-   phases sit within the PID loop.
+   The results of the OLR simulation with the leaky integrator.
+   The simulation reprodcues the measured Zernikes relatively well.
+   The disagreement below sequence number 50 is while the simulation is still
+   settling down.
 
-The filter operates on a 106-element state vector composed of the 84
-active OFC Zernike values (4 detectors × 21 modes, excluding Z20/Z21)
-and the 22 active DoF trim values:
 
-.. math::
+What is the impact of relaxing the Max_Integral limits?
+-------------------------------------------------------------------------------------------------
 
-   \mathbf{x} = \begin{pmatrix} \mathbf{z}_\mathrm{flat} \\ \mathbf{t} \end{pmatrix}
+The integral term has maximum limits in the OFC code to prevent the integral term from growing too large.  When we implemented the leaky integral on sky, we realized that
+these limits were set too low, especially for the Cam-dX, Cam-dY, M2-dX, and M2-dY DoFs.  I first verified that these limits are being applied in the simulation, and yes, they definitely are.
+In figure :numref:`fig-leaky-2` I relaxed these Max_Integral terms to 5000.0 for all DoFs.  By comparing to Figure :numref:`fig-leaky-1`, you can see that this made basically no difference.
 
-The state transition matrix :math:`F` at present is simply the identity matrix,
-so the trim and zernike values persist between visits.  This formulation of the
-Kalman filter needs discussion.
+.. figure:: _static/PID_Simulator_Test6_20261113.png
+   :name: fig-leaky-2
+   :width: 100%
+   :alt: Leaky integrator with relaxed Max_Integral
 
-.. math::
+   The results of the OLR simulation with the leaky integrator and all Max_Integral terms relaxed to 5000.0.
+   This is basically identical to the baseline simulation.
 
-   F = \begin{pmatrix} I_{106} \end{pmatrix}
 
-A control-input matrix :math:`B = [0_{84 \times 22};\; I_{22}]^T`
-propagates the applied tweak into the trim state each visit.  The
-observation matrix :math:`H = [I_{84}\;|\;0_{84 \times 22}]` selects
-only the Zernike block, since we observe Zernikes but not the trim
-directly.
+Adjust Kp and Ki for the Cam-dZ and M2-dZ DoFs.
+-------------------------------------------------------------------------------------------------
 
-The update and predict steps follow the standard Kalman equations.  The
-filter is enabled with ``use_kalman=True`` and is configured by three
-covariance parameters:
+There are many proposals for fine tuning the Kp, Ki, and possibly Kd parameters, as well as the i_factor term, which sets how far back the integral term is summed.  With the caveat that the OLR simulation may not be capable of quantitative fine tuning, I present here the results of adjusting those parameters.  In this section, I kept all Kp parameters at 0.3, and all Ki parameters at 0.05, except I adjusted Kp and Ki for the Cam-dZ and M2-dZ DoFs only.  I then looked at the standard deviation of the Z4 Zernike as a figure of merit for how well the system was controlling.  All of these tests were also run with the Max_Integral relaxed to 5000.0 as in the previous section.  In figure :numref:`fig-leaky-3` the best results are obtained by keeping Ki relatively small and increasing Kp substantially. In figure :numref:`fig-leaky-4` this was repeated with i_factor=0.8, leading to more past terms included in the integral.  Again, the best results are obtained by keeping Ki relatively small and increasing Kp substantially.
 
-- ``kalman_r_sigma`` — standard deviation of Zernike measurement noise
-  (default 0.05 µm); sets :math:`R = \sigma_R^2 I_{84}`.  There is also
-  the option to enter the kalman_r matrix directly.
-- ``kalman_q_z_sigma`` — process noise on the Zernike block (default
-  1×10⁻⁴ µm; Zernikes evolve slowly between visits).
-- ``kalman_q_trim_sigma`` — process noise on the trim block (default
-  1×10⁻⁶ µm; trim is updated deterministically via :math:`B`).
+.. figure:: _static/PID_Simulator_20261113.png
+   :name: fig-leaky-3
+   :width: 100%
+   :alt: Kp and Ki variation for Cam-dZ and M2-dZ DoFs
 
-When ``use_kalman=False`` (the default) the simulation is identical to
-the non-Kalman case.
+   For these simulations, all Kp parameters were kept at 0.3, and all Ki parameters were kept at 0.05, except Kp and Ki were adjusted for the Cam-dZ and M2-dZ DoFs only.
+   The minimum standard deviation of Z4 is obtained by keep Ki relatively small and increasing Kp substantially. This is with i_factor=0.5, as it was on sky.
 
-.. _kalman-results:
 
-Results
--------
+.. figure:: _static/PID_Simulator_If0p8_20261113.png
+   :name: fig-leaky-4
+   :width: 100%
+   :alt: Kp and Ki variation for Cam-dZ and M2-dZ DoFs
 
-The Kalman filtering methodology is new, but there are some initial
-results.  :numref:`fig-kalman1` through :numref:`fig-kalman4` show what
-happens when the R matrix of measurement errors is a multiple of the
-identity with a given sigma.  When the sigma is zero, the measurements
-are assumed perfect and no Kalman filtering is done.  As the sigma
-increases, the loop converges more slowly until it fails to converge at
-all.
+   For these simulations, all Kp parameters were kept at 0.3, and all Ki parameters were kept at 0.05, except Kp and Ki were adjusted for the Cam-dZ and M2-dZ DoFs only.
+   The minimum standard deviation of Z4 is obtained by keep Ki relatively small and increasing Kp substantially. This is with i_factor=0.8, leading to more past terms included in the integral.
+   
 
-:numref:`fig-kalman5` through :numref:`fig-kalman8` use the Zernike
-covariance matrix originally calculated by Bo Xin.  The R matrix and the
-Q matrix together determine how the Kalman filtering takes place: when
-:math:`R \ll Q` the measurements take precedence and little filtering is
-done; when :math:`Q \ll R` the model dominates over the measurements.
-In order to use the calculated covariance matrix, the Q sigmas needed to
-be increased substantially for the loop to converge.  Much more study is
-needed to determine:
-
-- Whether the Kalman filter is coded correctly.
-- Whether it will be useful in our control loops.
-- What the proper R and Q matrices should be.
-
-As of this writing, no benefit to the Kalman filtering is seen, but
-hopefully with code or parameter improvements a benefit will be
-demonstrated.
-
-.. list-table::
-   :widths: 50 50
-   :header-rows: 0
-
-   * - .. figure:: _static/PID_Simulator_Kalman_1_20260329.png
-          :width: 100%
-          :name: fig-kalman1
-          :alt: Kalman filter with R-matrix sigma = 0
-
-          R-matrix sigma = 0.
-
-	  The Kalman filter
-
-	  has no impact, as expected.
-
-     - .. figure:: _static/PID_Simulator_Kalman_3_20260329.png
-          :width: 100%
-          :name: fig-kalman2
-          :alt: Kalman filter with R-matrix sigma = 1E-4
-
-          R-matrix sigma = 1×10⁻⁴.
-
-	  Similar to R_sigma = 0.0.
-
-   * - .. figure:: _static/PID_Simulator_Kalman_2_20260329.png
-          :width: 100%
-          :name: fig-kalman3
-          :alt: Kalman filter with R-matrix sigma = 5E-4
-
-          R-matrix sigma = 5×10⁻⁴.
-
-	  Control converges more slowly.
-
-     - .. figure:: _static/PID_Simulator_Kalman_4_20260329.png
-          :width: 100%
-          :name: fig-kalman4
-          :alt: Kalman filter with R-matrix sigma = 8E-4
-
-          R-matrix sigma = 8×10⁻⁴.
-
-	  Control converges more slowly still.
-
-.. list-table::
-   :widths: 50 50
-   :header-rows: 0
-
-	  
-   * - .. figure:: _static/PID_Simulator_Kalman_7_20260329.png
-          :width: 100%
-          :name: fig-kalman5
-          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 1E-4
-
-          R=calculated covs
-
-	  both Q sigmas = 1E-4.
-
-     - .. figure:: _static/PID_Simulator_Kalman_10_20260329.png
-          :width: 100%
-          :name: fig-kalman6
-          :alt: Kalman filter with R=calculated covs, Q sigmas = 0.001
-
-          R=calculated covs
-
-	  both Q sigmas = 1E-3.
-
-   * - .. figure:: _static/PID_Simulator_Kalman_8_20260329.png
-          :width: 100%
-          :name: fig-kalman7
-          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 0.01
-
-          R=calculated covs
-
-	  both Q sigmas = 0.01.
-
-     - .. figure:: _static/PID_Simulator_Kalman_9_20260329.png
-          :width: 100%
-          :name: fig-kalman8
-          :alt: Kalman filter with R-matrix of calculated covariances, Q sigmas = 0.1
-
-          R=calculated covs
-
-	  both Q sigmas = 0.1.
-	  
 .. _conclusions:
 
 Conclusions and Future Work
 ============================
+
+Note: These conclusions have not been updated for the leaky integrator results.
 
 The open-loop reproduction PID simulator has proved to be a useful tool
 for understanding and optimising the MTAOS control loop without
@@ -1060,8 +954,6 @@ are:
 
 **Planned future work:**
 
-- Validate and tune the Kalman filter to determine whether it allows
-  higher stable gains and smaller Zernike residuals.
 - Investigate the bending-mode saturation hypothesis to explain nights
   where the simulation does not recover the measured Zernikes.
 - Explore the full parameter space of Kp, Ki, and ``max_integral``.
